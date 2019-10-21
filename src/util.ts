@@ -1,51 +1,73 @@
-'use strict';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import * as expandTilde from 'expand-tilde';
-import * as ini from 'node-ini';
+import untildify from 'untildify';
+import * as ini from 'ini';
 
-export function scanAnsibleCfg( rootPath=undefined ) {
-  console.log(`here is util.read_cfg()`);
-  /*
-  * Reading order:
-  * 1) ANSIBLE_CONFIG
-  * 2) ansible.cfg (in current workspace)
-  * 3) ~/.ansible.cfg
-  * 4) /etc/ansible.cfg
-  */
-  let cfgFiles = [
-    `~/.ansible.cfg`,
-    `/etc/ansible.cfg`
-  ]
-  if (rootPath != undefined) {
-    cfgFiles.unshift( `${rootPath}/ansible.cfg` );
-  }
-  if (process.env.ANSIBLE_CONFIG != null) {
-    cfgFiles.unshift( process.env.ANSIBLE_CONFIG );
-  }
+// Get rootPath based on multi-workspace API
+export function getRootPath(editorDocumentUri : vscode.Uri) {
+    let rootPath : string | undefined = undefined;
 
-  for (let i = 0; i < cfgFiles.length; i++)  {
-    let cfgFile = cfgFiles[i];
-    let cfgPath = expandTilde(cfgFile);
-
-    let cfg = getValueByCfg(cfgPath);
-    if (cfg != "") {
-      // key: defaults.vault_password_file
-      if (cfg.defaults != null && cfg.defaults.vault_password_file != null) {
-        console.log(`Found ansible.cfg from ${cfgPath} contain defaults.vault_password_file`);
-        return cfgPath;
-      }
+    if (!!vscode.workspace.workspaceFolders) {
+        rootPath = vscode.workspace.workspaceFolders.length ? vscode.workspace.workspaceFolders[0].name : undefined;
     }
-  }
 
-  return false;
+    if (!!vscode.workspace.getWorkspaceFolder) {
+        let workspaceFolder = vscode.workspace.getWorkspaceFolder(editorDocumentUri);
+
+        if (!!workspaceFolder) {
+            rootPath = workspaceFolder.uri.path;
+        } else {
+            // not under any workspace
+            rootPath = undefined;
+        }
+    }
+
+    return rootPath;
 }
 
-let getValueByCfg = (path) => {
-  console.log(`Reading ${path}...`);
-  if (fs.existsSync(path)) {
-    return ini.parseSync(path);
-  }
+export function scanAnsibleCfg(rootPath : any = undefined) {
+    console.log(`util.scanAnsibleCfg(${rootPath})`);
 
-  return "";
+    /*
+     * Reading order:
+     * 1) ANSIBLE_CONFIG
+     * 2) ansible.cfg (in current workspace)
+     * 3) ~/.ansible.cfg
+     * 4) /etc/ansible.cfg
+     */
+    let cfgFiles = [
+        `~/.ansible.cfg`,
+        `/etc/ansible.cfg`
+    ];
+
+    if (!!rootPath) {
+        cfgFiles.unshift(`${rootPath}/ansible.cfg`);
+    }
+
+    if (!!process.env.ANSIBLE_CONFIG) {
+        cfgFiles.unshift(process.env.ANSIBLE_CONFIG);
+    }
+
+    for (let i = 0; i < cfgFiles.length; i++) {
+        let cfgFile = cfgFiles[i];
+        let cfgPath = untildify(cfgFile);
+
+        let cfg = getValueByCfg(cfgPath);
+        if (!!cfg && !!cfg.defaults && !!cfg.defaults.vault_password_file) {
+            console.log(`Found 'defaults.vault_password_file' within '${cfgPath}'`);
+            return cfgPath;
+        }
+    }
+
+    return "";
 }
+
+let getValueByCfg = (path: any) => {
+    console.log(`Reading '${path}'...`);
+
+    if (fs.existsSync(path)) {
+        return ini.parse(fs.readFileSync(path, 'utf-8'));
+    }
+
+    return undefined;
+};
