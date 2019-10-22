@@ -1,65 +1,26 @@
-# ansible-vault-inline README
+# VSCode ansible-vault-inline extension
+[![Visual Studio Marketplace](https://img.shields.io/vscode-marketplace/w/wolfmah.ansible-vault-inline.svg)](https://marketplace.visualstudio.com/items?itemName=wolfmah.ansible-vault-inline)
 
-This is the README for your extension "ansible-vault-inline". After writing up a brief description, we recommend including the following sections.
+VSCode extensions to encrypt/decrypt ansible-vault file as well as selected text. Can toggle with <kbd>ctl+alt+0</kbd>, on macOS with <kbd>cmd+alt+0</kbd>.
 
-## Features
+_Fork of [dhoeric/vscode-ansible-vault](https://github.com/dhoeric/vscode-ansible-vault), which in turn was inspired by [sydro/atom-ansible-vault](https://github.com/sydro/atom-ansible-vault)_
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+![Encryption demo](images/demo.gif)
 
-For example if there is an image subfolder under your extension project workspace:
 
-\!\[feature X\]\(images/feature-x.png\)
+## Usage
+To read vault password file in your computer, you can specify the `vault_password_file` in ansible.cfg or through [extension settings](#extension-settings).
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+- Ansible
+
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
 This extension contributes the following settings:
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+* `ansibleVaultInline.executable`: Full path of ansible-vault executable (e.g. `/usr/local/bin/ansible-vault`)
+* `ansibleVaultInline.keyfile`: Ansible-vault password file path (e.g. `~/.vault-pass.txt`)
+* `ansibleVaultInline.keypass`: Ansible-vault password text (e.g. `GT6rAP7rxYzeFC1KtHVW`)
