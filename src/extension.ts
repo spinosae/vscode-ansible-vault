@@ -16,6 +16,11 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 
+		let selection = editor.selection;
+		if (!selection) {
+			return;
+		}
+
 		let config = vscode.workspace.getConfiguration('ansibleVaultInline');
 		let doc = editor.document;
 		let keypath = "";
@@ -52,7 +57,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		}
 
-		const text = editor.document.getText(editor.selection)
+		const text = editor.document.getText(selection)
 
 		// Go encrypt / decrypt
 		if (!!text) {
@@ -63,14 +68,14 @@ export function activate(context: vscode.ExtensionContext) {
 
 				let encryptedText = encryptInline(text, rootPath, keyInCfg, keypath, config);
 				editor.edit(editBuilder => {
-					editBuilder.replace(editor.selection, encryptedText);
+					editBuilder.replace(selection, encryptedText);
 				});
 			} else if (type === 'encrypted') {
 				console.log(`Decrypt selected text`);
 
 				let decryptedText = decryptInline(text, rootPath, keyInCfg, keypath, config);
 				editor.edit(editBuilder => {
-					editBuilder.replace(editor.selection, decryptedText);
+					editBuilder.replace(selection, decryptedText);
 				});
 			}
 		} else {
