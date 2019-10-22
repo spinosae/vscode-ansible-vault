@@ -49,12 +49,6 @@
 			}
 		],
 		"menus": {
-			"commandPalette": [
-				{
-					"command": "extension.ansibleVaultInline",
-					"when": "editorTextFocus"
-				}
-			],
 			"editor/context": [
 				{
 					"command": "extension.ansibleVaultInline",
