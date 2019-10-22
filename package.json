@@ -44,7 +44,7 @@
 		"commands": [
 			{
 				"command": "extension.ansibleVaultInline",
-				"title": "Encrypt/Decrypt with ansible-vault (inline edition)",
+				"title": "Encrypt/Decrypt with ansible-vault-inline",
 				"category": "Ansible Vault"
 			}
 		],
