@@ -104,6 +104,6 @@
 	"icon": "",
 	"repository": {
 		"type": "git",
-		"url": "https://gitlab.com/wolfmah/vscode-ansible-vault.git"
+		"url": "https://gitlab.com/wolfmah/vscode-ansible-vault-inline.git"
 	}
 }
