@@ -49,6 +49,11 @@ npm version [major|minor|patch] --no-git-tag-version
 ```
 vsce publish --pat X_PERSONAL_ACCESS_TOKEN_X
 ```
+* Create a tag
+```
+git tag x.x.x
+git push origin x.x.x
+```
 * Create a release in Gitlab
 ```
 curl --header 'Content-Type: application/json' --header "PRIVATE-TOKEN: X_ACCESS_TOKEN_X" --data '{ "name": "Release x.x.x", "tag_name": "x.x.x", "description": "# CHANGELOG\n## [x.x.x] - 2019-10-21\n### Added\n- Initial release" }' --request POST https://gitlab.com/api/v4/projects/14922723/releases

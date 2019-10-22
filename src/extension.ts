@@ -57,7 +57,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		}
 
-		const text = editor.document.getText(selection)
+		const text = editor.document.getText(selection);
 
 		// Go encrypt / decrypt
 		if (!!text) {
