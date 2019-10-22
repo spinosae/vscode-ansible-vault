@@ -1,5 +1,9 @@
 # VSCode ansible-vault-inline extension
-[![Visual Studio Marketplace](https://img.shields.io/vscode-marketplace/w/wolfmah.ansible-vault-inline.svg)](https://marketplace.visualstudio.com/items?itemName=wolfmah.ansible-vault-inline)
+
+[![Version Badge](https://img.shields.io/vscode-marketplace/v/wolfmah.ansible-vault-inline.svg?style=flat-square&label=marketplace)](https://marketplace.visualstudio.com/items?itemName=wolfmah.ansible-vault-inline)
+[![Installs Badge](https://img.shields.io/vscode-marketplace/i/wolfmah.ansible-vault-inline.svg?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=wolfmah.ansible-vault-inline)
+[![Rating Badge](https://img.shields.io/vscode-marketplace/r/wolfmah.ansible-vault-inline.svg?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=wolfmah.ansible-vault-inline)
+[![License Badge](https://img.shields.io/badge/License-MPL%202.0-blue.svg?style=flat-square)](https://www.mozilla.org/en-US/MPL/2.0/)
 
 VSCode extensions to encrypt/decrypt ansible-vault file as well as selected text. Can toggle with <kbd>ctl+alt+0</kbd>, on macOS with <kbd>cmd+alt+0</kbd>.
 
