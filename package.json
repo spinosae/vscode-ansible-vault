@@ -101,9 +101,8 @@
 		"pretest": "npm run compile",
 		"test": "node ./out/test/runTest.js"
 	},
-	"icon": "",
 	"repository": {
 		"type": "git",
-		"url": "https://gitlab.com/wolfmah/vscode-ansible-vault-inline.git"
+		"url": "https://gitlab.com/wolfmah/vscode-ansible-vault-inline"
 	}
 }

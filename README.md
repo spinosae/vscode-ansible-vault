@@ -5,8 +5,6 @@ VSCode extensions to encrypt/decrypt ansible-vault file as well as selected text
 
 _Fork of [dhoeric/vscode-ansible-vault](https://github.com/dhoeric/vscode-ansible-vault), which in turn was inspired by [sydro/atom-ansible-vault](https://github.com/sydro/atom-ansible-vault)_
 
-![Encryption demo](images/demo.gif)
-
 
 ## Usage
 To read vault password file in your computer, you can specify the `vault_password_file` in ansible.cfg or through [extension settings](#extension-settings).
