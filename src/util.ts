@@ -59,6 +59,7 @@ export function scanAnsibleCfg(rootPath : any = undefined) {
         }
     }
 
+    console.log(`Found no 'defaults.vault_password_file' within config files`);
     return "";
 }
 
