@@ -66,9 +66,9 @@ export function activate(context: vscode.ExtensionContext) {
 			if (type === 'plaintext') {
 				console.log(`Encrypt selected text`);
 
-				let encryptedText = encryptInline(text, rootPath, keyInCfg, keypath, config);
+				let encryptedText = "!vault |\n"+encryptInline(text, rootPath, keyInCfg, keypath, config);
 				editor.edit(editBuilder => {
-					editBuilder.replace(selection, encryptedText);
+					editBuilder.replace(selection, encryptedText.replace(/\n/g,'\n'+" ".repeat(selection.start.character)));
 				});
 			} else if (type === 'encrypted') {
 				console.log(`Decrypt selected text`);
