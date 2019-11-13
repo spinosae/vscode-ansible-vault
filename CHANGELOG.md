@@ -4,6 +4,11 @@ All notable changes to the `ansible-vault-inline` extension will be documented i
 
 ## [Unreleased]
 
+## [0.3.0] - 2019-11-12
+### Changed
+- Added '!vault |' when encrypting
+- Kept the indentation of the inline string when encrypting
+
 ## [0.2.0] - 2019-10-22
 ### Changed
 - Better documentation
