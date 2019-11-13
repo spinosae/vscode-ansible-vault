@@ -117,12 +117,12 @@ let getInlineTextType = (text : string) => {
 	}
 
 	return (text.trim().startsWith('$ANSIBLE_VAULT;')) ? 'encrypted' : 'plaintext';
-}
+};
 
 // Returns wheter the file is encrypted or in plain text.
 let getTextType = (text : string) => {
 	return (text.indexOf('$ANSIBLE_VAULT;') === 0) ? 'encrypted' : 'plaintext';
-}
+};
 
 let encryptInline = (text : string, rootPath : string | undefined, keyInCfg : string, pass : string, config : vscode.WorkspaceConfiguration) => {
 	let tmpFilename = tmp.tmpNameSync();
