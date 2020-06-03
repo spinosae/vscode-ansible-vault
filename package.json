@@ -1,13 +1,13 @@
 {
-	"name": "ansible-vault-inline",
-	"version": "0.3.0",
-	"publisher": "wolfmah",
+	"name": "ansible-vault",
+	"version": "0.1.0",
+	"publisher": "spinosae",
 	"engines": {
 		"vscode": "^1.39.0"
 	},
 	"license": "SEE LICENSE IN LICENSE",
-	"displayName": "ansible-vault-inline",
-	"description": "Encrypt/decrypt ansible-vault file/inline",
+	"displayName": "Ansible Vault",
+	"description": "Encrypt/decrypt files with ansible vault, supports vault-id",
 	"categories": [
 		"Other"
 	],
@@ -28,23 +28,13 @@
 					"type": "string",
 					"default": "ansible-vault",
 					"description": "Full path of ansible-vault executable"
-				},
-				"ansibleVaultInline.keypass": {
-					"type": "string",
-					"default": "~/.qmi/.vault_password.txt",
-					"description": "ansible-vault password text"
-				},
-				"ansibleVaultInline.keyfile": {
-					"type": "string",
-					"default": "",
-					"description": "ansible-vault password file path"
 				}
 			}
 		},
 		"commands": [
 			{
 				"command": "extension.ansibleVaultInline",
-				"title": "Encrypt/Decrypt with ansible-vault-inline",
+				"title": "Encrypt/Decrypt",
 				"category": "Ansible Vault"
 			}
 		],
@@ -97,6 +87,6 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://gitlab.com/wolfmah/vscode-ansible-vault-inline"
+		"url": "https://github.com/spinosae/vscode-ansible-vault.git"
 	}
 }

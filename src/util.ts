@@ -53,17 +53,17 @@ export function scanAnsibleCfg(rootPath : any = undefined) {
         let cfgPath = untildify(cfgFile);
 
         let cfg = getValueByCfg(cfgPath);
-        if (!!cfg && !!cfg.defaults && !!cfg.defaults.vault_password_file) {
-            console.log(`Found 'defaults.vault_password_file' within '${cfgPath}'`);
+        if (!!cfg && !!cfg.defaults && !!cfg.defaults.vault_identity_list) {
+            console.log(`Found 'defaults.vault_identity_list' within '${cfgPath}'`);
             return cfgPath;
         }
     }
 
-    console.log(`Found no 'defaults.vault_password_file' within config files`);
+    console.log(`Found no 'defaults.vault_identity_list' within config files`);
     return "";
 }
 
-let getValueByCfg = (path: any) => {
+export function getValueByCfg(path: any) {
     console.log(`Reading '${path}'...`);
 
     if (fs.existsSync(path)) {

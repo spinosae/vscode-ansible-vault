@@ -1,9 +1,17 @@
 import * as vscode from 'vscode';
-import untildify from 'untildify';
 import * as tmp from 'tmp';
 import * as child_process from 'child_process';
 import * as fs from "fs";
 import * as util from './util';
+
+async function ask_for_vault_id(ansible_cfg: string) {
+	let vault_id: string = "default";
+	let cfg : any = util.getValueByCfg(ansible_cfg);
+	let identity_list = cfg.defaults.vault_identity_list.split(',').map( (id : string) => id.split('@', 2)[0].trim());
+	await vscode.window.showQuickPick(identity_list)
+		.then( chosen => { if (chosen) { vault_id = chosen; } } );	
+	return vault_id;
+}
 
 export function activate(context: vscode.ExtensionContext) {
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
@@ -36,25 +44,6 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showInformationMessage(`Getting vault keyfile from ${keyInCfg}`);
 		} else {
 			console.log(`Found nothing from config files`);
-
-			if (!!config.keyfile) {
-				keypath = untildify(config.keyfile.trim('/'));
-			}
-
-			// Need user to input the ansible-vault pass
-			if (!keypath) {
-				pass = config.keypass;
-
-				if (!pass) {
-					await vscode.window.showInputBox({ prompt: "Enter the ansible-vault keypass: " }).then((val) => {
-						pass = val;
-					});
-				}
-
-				keypath = tmp.tmpNameSync();
-				fs.writeFileSync(keypath, pass, 'utf8');
-				console.log(`Wrote password to temporary file: '${keypath}'`);
-			}
 		}
 
 		const text = editor.document.getText(selection);
@@ -65,15 +54,15 @@ export function activate(context: vscode.ExtensionContext) {
 
 			if (type === 'plaintext') {
 				console.log(`Encrypt selected text`);
-
-				let encryptedText = "!vault |\n"+encryptInline(text, rootPath, keyInCfg, keypath, config);
+				let vault_id : string = await ask_for_vault_id(keyInCfg);
+				let encryptedText = "!vault |\n"+encryptInline(text, rootPath, vault_id, config);
 				editor.edit(editBuilder => {
 					editBuilder.replace(selection, encryptedText.replace(/\n/g,'\n'+" ".repeat(selection.start.character)));
 				});
 			} else if (type === 'encrypted') {
 				console.log(`Decrypt selected text`);
 
-				let decryptedText = decryptInline(text, rootPath, keyInCfg, keypath, config);
+				let decryptedText = decryptInline(text, rootPath, config);
 				editor.edit(editBuilder => {
 					editBuilder.replace(selection, decryptedText);
 				});
@@ -87,20 +76,16 @@ export function activate(context: vscode.ExtensionContext) {
 
 			if (type === 'plaintext') {
 				console.log(`Encrypt entire file`);
-
-				encryptFile(doc.fileName, rootPath, keyInCfg, keypath, config);
+				let vault_id : string = await ask_for_vault_id(keyInCfg);
+				encryptFile(doc.fileName, rootPath, vault_id, config);
 				vscode.window.showInformationMessage(`File encrypted: '${doc.fileName}'`);
 			} else if (type === 'encrypted') {
 				console.log(`Decrypt entire file`);
 
-				decryptFile(doc.fileName, rootPath, keyInCfg, keypath, config);
+				decryptFile(doc.fileName, rootPath, config);
 				vscode.window.showInformationMessage(`File decrypted: '${doc.fileName}'`);
 			}
-		}
-
-		if (!!pass && !!keypath) {
-			fs.unlinkSync(keypath);
-			console.log(`Removed temporary file: '${keypath}'`);
+			vscode.commands.executeCommand('workbench.action.files.revert');
 		}
 	};
 
@@ -124,12 +109,12 @@ let getTextType = (text : string) => {
 	return (text.indexOf('$ANSIBLE_VAULT;') === 0) ? 'encrypted' : 'plaintext';
 };
 
-let encryptInline = (text : string, rootPath : string | undefined, keyInCfg : string, pass : string, config : vscode.WorkspaceConfiguration) => {
+let encryptInline = (text : string, rootPath : string | undefined, vault_id : string, config : vscode.WorkspaceConfiguration) => {
 	let tmpFilename = tmp.tmpNameSync();
 	fs.writeFileSync(tmpFilename, Buffer.from(text, 'utf8'));
 	console.log(`Wrote encrypted string to temporary file '${tmpFilename}'`);
 
-	encryptFile(tmpFilename, rootPath, keyInCfg, pass, config);
+	encryptFile(tmpFilename, rootPath, vault_id, config);
 	let encryptedText = fs.readFileSync(tmpFilename, 'utf8');
 	console.log(`encryptedText == '${encryptedText}'`);
 
@@ -141,7 +126,7 @@ let encryptInline = (text : string, rootPath : string | undefined, keyInCfg : st
 	return encryptedText.trim();
 };
 
-let decryptInline = (text : string, rootPath : string | undefined, keyInCfg : string, pass : string, config : vscode.WorkspaceConfiguration) => {
+let decryptInline = (text : string, rootPath : string | undefined, config : vscode.WorkspaceConfiguration) => {
 	// Delete inline vault prefix, then trim spaces and newline from the entire string and, at last, trim the spaces in the multiline string.
 	text = text.replace('!vault |', '').trim().replace(/[^\S\r\n]+/gm, '');
 
@@ -149,7 +134,7 @@ let decryptInline = (text : string, rootPath : string | undefined, keyInCfg : st
 	fs.writeFileSync(tmpFilename, Buffer.from(text, 'utf8'));
 	console.log(`Wrote encrypted string to temporary file '${tmpFilename}'`);
 
-	decryptFile(tmpFilename, rootPath, keyInCfg, pass, config);
+	decryptFile(tmpFilename, rootPath, config);
 	let decryptedText = fs.readFileSync(tmpFilename, 'utf8');
 	console.log(`decryptedText == '${decryptedText}'`);
 
@@ -161,14 +146,11 @@ let decryptInline = (text : string, rootPath : string | undefined, keyInCfg : st
 	return decryptedText;
 };
 
-let encryptFile = (f : string, rootPath : string | undefined, keyInCfg : string, pass : string, config : vscode.WorkspaceConfiguration) => {
+let encryptFile = (f : string, rootPath : string | undefined, vault_id : string, config : vscode.WorkspaceConfiguration) => {
 	console.log(`Encrypt file: ${f}`);
 
 	let cmd = `${config.executable} encrypt "${f}"`;
-	// Specify `--vault-password-file` when `vault_password_file` is not in `ansible.cfg`.
-	if (!keyInCfg) {
-		cmd += ` --vault-password-file="${pass}"`;
-	}
+	cmd += ` --encrypt-vault-id="${vault_id}"`;
 
 	if (!!rootPath) {
 		exec(cmd, { cwd: rootPath });
@@ -177,14 +159,10 @@ let encryptFile = (f : string, rootPath : string | undefined, keyInCfg : string,
 	}
 };
 
-let decryptFile = (f : string, rootPath : string | undefined, keyInCfg : string, pass : string, config : vscode.WorkspaceConfiguration) => {
+let decryptFile = (f : string, rootPath : string | undefined, config : vscode.WorkspaceConfiguration) => {
 	console.log(`Decrypt file: ${f}`);
 
 	let cmd = `${config.executable} decrypt "${f}"`;
-	// Specify `--vault-password-file` when `vault_password_file` is not in `ansible.cfg`.
-	if (!keyInCfg) {
-		cmd += ` --vault-password-file="${pass}"`;
-	}
 
 	if (!!rootPath) {
 		exec(cmd, { cwd: rootPath });
