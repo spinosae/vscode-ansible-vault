@@ -1,6 +1,6 @@
 {
 	"name": "ansible-vault",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"publisher": "spinosae",
 	"engines": {
 		"vscode": "^1.39.0"
